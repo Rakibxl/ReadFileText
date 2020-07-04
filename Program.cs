@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace ReadFileText
 {
     class Program
     {
-     public  class  SamsungOrder
+        public class SamsungOrder
 
         {
 
@@ -25,7 +25,7 @@ namespace ReadFileText
 
             public string ExternelReference { get; set; }
 
- 
+
             public List<SamsungOrderRow> GetSetOrderRows
 
             {
@@ -40,7 +40,7 @@ namespace ReadFileText
 
             {
 
-          
+
                 Console.WriteLine(" OrderRows are:- ");
 
                 foreach (SamsungOrderRow c in this.GetSetOrderRows)
@@ -57,18 +57,17 @@ namespace ReadFileText
                     Console.WriteLine(" DeliveryDate:->" + c.DeliveryDate);
                     Console.WriteLine(" SamsungOrder's ExternalReference:- " + this.ExternelReference);
 
-                    
+
                     Console.WriteLine(" Another Row");
                     Console.WriteLine("---------------------------------");
 
-                    Console.WriteLine("Call SamsunOrder Add");
 
                     // Here we can call SamsungOrderAdd to fill order item 
 
                 }
 
-                    // Finally we can execute SamsungOrderJobSelect
-                    // From development branch
+                // Finally we can execute SamsungOrderJobSelect
+                // From development branch
 
 
             }
@@ -91,7 +90,7 @@ namespace ReadFileText
         static void Main(string[] args)
         {
 
-            string fileName = @"C:\Temp\emails\20A1035736.txt";
+            string fileName = @"C:\Temp\20A1013502.txt";
 
             var skipLine = 0;
 
@@ -99,51 +98,15 @@ namespace ReadFileText
 
             SamsungOrderRow orderRow = new SamsungOrderRow();
 
-            //orderRow.ArticleCode = "F-SCBSMT36TM";
-            //orderRow.Price = "69.02";
-            //orderRow.Quantity = 1;
-            //orderRow.Amount = "69.02";
-            //orderRow.DeliveryDate = "2019.09.26".Replace(".","-");
 
-            //Lst.Add(orderRow);
-
-
-
-            //orderRow = new SamsungOrderRow();
-
-            //orderRow.ArticleCode = "F-SCBSMT36TM";
-            //orderRow.Price = "69.02";
-            //orderRow.Quantity = 1;
-            //orderRow.Amount = "69.02";
-            //orderRow.DeliveryDate = "2019.09.26".Replace(".", "-");
-
-            //Lst.Add(orderRow);
-
-            //orderRow.getSetOrderRow = Lst;
-
-
-
-            SamsungOrder m = new SamsungOrder();
-
-            //m.OrderNumber = "5282196578";
-            //m.OrderDate = "2019.09.25".Replace(".","-");
-            //m.DistributorCode = "2061971 ESPRI";
-            //m.ExternelReference = "19a1114551";
-
-
-            //m.GetSetOrderRows = orderRow.getSetOrderRow;
-
-            //m.Print();
-
-
-
+            SamsungOrder samsungOrder = new SamsungOrder();
 
             /// Now  try with dynamic data
 
             //- Open the text file
             using (StreamReader sr = new StreamReader(fileName))
             {
-                                
+
                 string line;    //- Holds the entire line
 
                 //- Cycle thru the text file 1 line at a time pulling
@@ -182,28 +145,33 @@ namespace ReadFileText
                             continue;
                         }
 
+                        if (line.Trim().Contains("1 / 1"))
+                        {
+                            continue;
+                        }
+
+
 
                         if (line.Trim().Contains("PO No"))
                         {
 
                             //Regex regex = new Regex(@"\d{10}");
 
-                            Match matchOrder = Regex.Match(line.Trim(), @"\d{10}",RegexOptions.IgnoreCase);
+                            Match matchOrder = Regex.Match(line.Trim(), @"\d{10}", RegexOptions.IgnoreCase);
 
                             if (matchOrder.Success)
                             {
-                                m.OrderNumber = matchOrder.Value;
+                                samsungOrder.OrderNumber = matchOrder.Value;
                             }
 
                             Match matchOrderDate = Regex.Match(line.Trim(), @"\d{4}[.]\d{2}[.]\d{2}", RegexOptions.IgnoreCase);
 
                             if (matchOrderDate.Success)
                             {
-                                m.OrderDate = matchOrderDate.Value.Replace(".", "-");
+                                samsungOrder.OrderDate = matchOrderDate.Value.Replace(".", "-");
                             }
 
-                            //m.OrderNumber = line.Substring(8, 10).Trim();
-                            //m.OrderDate = line.Substring(26, 10).Trim().Replace(".", "-");
+                            samsungOrder.ExternelReference = Path.GetFileNameWithoutExtension(fileName);
                         }
 
                         if (line.Trim().Contains("Sales Person"))
@@ -212,36 +180,51 @@ namespace ReadFileText
 
                             if (matchDistributor.Success)
                             {
-                                m.DistributorCode = matchDistributor.Value;
+                                samsungOrder.DistributorCode = matchDistributor.Value;
                             }
 
-                            //m.DistributorCode = line.Substring(15, 14).Trim();
 
                         }
 
                         if (line.Trim().StartsWith("1"))
+                        // if (Regex.IsMatch(line.Trim(), @"^\d")) // Check if start number is a number
                         {
-                            orderRow.ArticleCode = line.Substring(2, 14).Trim();
-                            orderRow.Quantity = Convert.ToInt32(line.Substring(16, 2).Trim());
-                            orderRow.Price = line.Substring(18, 5).Trim();
-                            orderRow.DeliveryDate = line.Substring(33, 10).Trim().Replace(".", "-");
-                            orderRow.Amount = line.Substring(23, 2).Trim();
 
+                            string[] OrderItem = line.Trim().Split(' ');
+
+                            orderRow.ArticleCode = OrderItem[1];
+                            orderRow.Quantity = Convert.ToInt32(OrderItem[2]);
+                            orderRow.Price = OrderItem[3];
+                            orderRow.Amount = OrderItem[6];
+                            orderRow.DeliveryDate = OrderItem[7].Replace(".", "-");
 
                             Lst.Add(orderRow);
 
                         }
-
                         if (line.Trim().StartsWith("2"))
+                        //if (Regex.IsMatch(line.Trim(), @"^\d")) // // Check if start number is a number
                         {
-                            orderRow = new SamsungOrderRow();
 
-                            orderRow.ArticleCode = line.Substring(2, 14).Trim();
-                            orderRow.Quantity = Convert.ToInt32(line.Substring(16, 2).Trim());
-                            orderRow.Price = line.Substring(18, 5).Trim();
-                            orderRow.DeliveryDate = line.Substring(33, 10).Trim().Replace(".", "-");
-                            orderRow.Amount = line.Substring(23, 2).Trim();
+                            try
+                            {
+                                orderRow = new SamsungOrderRow();
 
+                                string[] OrderItem = line.Trim().Split(' ');
+
+                                orderRow.ArticleCode = OrderItem[1];
+                                orderRow.Quantity = Convert.ToInt32(OrderItem[2]);
+                                orderRow.Price = OrderItem[3];
+                                orderRow.Amount = OrderItem[6];
+                                orderRow.DeliveryDate = OrderItem[7].Replace(".", "-");
+
+
+                            }
+                            catch (Exception ex)
+                            {
+
+                                Console.Write(ex.ToString());
+
+                            }
 
                             Lst.Add(orderRow);
 
@@ -251,9 +234,9 @@ namespace ReadFileText
                         {
                             orderRow.getSetOrderRow = Lst;
 
-                            m.GetSetOrderRows = orderRow.getSetOrderRow;
+                            samsungOrder.GetSetOrderRows = orderRow.getSetOrderRow;
 
-                            m.Print();
+                            samsungOrder.Print();
 
                         }
 
@@ -267,17 +250,9 @@ namespace ReadFileText
 
                 }
                 sr.Close();
-               
+
             }
 
-
-
-
-
-
-
-
-            Console.ReadLine();
         }
     }
 }
