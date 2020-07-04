@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ReadFileText
@@ -184,13 +185,37 @@ namespace ReadFileText
 
                         if (line.Trim().Contains("PO No"))
                         {
-                            m.OrderNumber = line.Substring(8, 10).Trim();
-                            m.OrderDate = line.Substring(26, 10).Trim().Replace(".", "-");
+
+                            //Regex regex = new Regex(@"\d{10}");
+
+                            Match matchOrder = Regex.Match(line.Trim(), @"\d{10}",RegexOptions.IgnoreCase);
+
+                            if (matchOrder.Success)
+                            {
+                                m.OrderNumber = matchOrder.Value;
+                            }
+
+                            Match matchOrderDate = Regex.Match(line.Trim(), @"\d{4}[.]\d{2}[.]\d{2}", RegexOptions.IgnoreCase);
+
+                            if (matchOrderDate.Success)
+                            {
+                                m.OrderDate = matchOrderDate.Value.Replace(".", "-");
+                            }
+
+                            //m.OrderNumber = line.Substring(8, 10).Trim();
+                            //m.OrderDate = line.Substring(26, 10).Trim().Replace(".", "-");
                         }
 
                         if (line.Trim().Contains("Sales Person"))
                         {
-                            m.DistributorCode = line.Substring(15, 14).Trim();
+                            Match matchDistributor = Regex.Match(line.Trim(), @"\d{7}\s\w{5}", RegexOptions.IgnoreCase);
+
+                            if (matchDistributor.Success)
+                            {
+                                m.DistributorCode = matchDistributor.Value;
+                            }
+
+                            //m.DistributorCode = line.Substring(15, 14).Trim();
 
                         }
 
@@ -229,7 +254,7 @@ namespace ReadFileText
                             m.GetSetOrderRows = orderRow.getSetOrderRow;
 
                             m.Print();
-                            break;
+
                         }
 
 
