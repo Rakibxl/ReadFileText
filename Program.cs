@@ -36,7 +36,7 @@ namespace ReadFileText
 
             }
 
-            public void Print()
+            public void OrderDetails()
 
             {
 
@@ -67,8 +67,6 @@ namespace ReadFileText
                 }
 
                 // Finally we can execute SamsungOrderJobSelect
-                // From development branch
-
 
             }
 
@@ -90,11 +88,11 @@ namespace ReadFileText
         static void Main(string[] args)
         {
 
-            string fileName = @"C:\Temp\20A1013502.txt";
+            string fileName = @"C:\Temp\emails\20A1013502.txt";
 
             var skipLine = 0;
 
-            List<SamsungOrderRow> Lst = new List<SamsungOrderRow>();
+            List<SamsungOrderRow> List = new List<SamsungOrderRow>();
 
             SamsungOrderRow orderRow = new SamsungOrderRow();
 
@@ -155,7 +153,6 @@ namespace ReadFileText
                         if (line.Trim().Contains("PO No"))
                         {
 
-                            //Regex regex = new Regex(@"\d{10}");
 
                             Match matchOrder = Regex.Match(line.Trim(), @"\d{10}", RegexOptions.IgnoreCase);
 
@@ -198,7 +195,7 @@ namespace ReadFileText
                             orderRow.Amount = OrderItem[6];
                             orderRow.DeliveryDate = OrderItem[7].Replace(".", "-");
 
-                            Lst.Add(orderRow);
+                            List.Add(orderRow);
 
                         }
                         if (line.Trim().StartsWith("2"))
@@ -226,17 +223,27 @@ namespace ReadFileText
 
                             }
 
-                            Lst.Add(orderRow);
+                            List.Add(orderRow);
 
                         }
 
                         if (line.Trim().Contains("Remark"))
                         {
-                            orderRow.getSetOrderRow = Lst;
+                            orderRow.getSetOrderRow = List;
 
                             samsungOrder.GetSetOrderRows = orderRow.getSetOrderRow;
 
-                            samsungOrder.Print();
+                            samsungOrder.OrderDetails();
+
+
+                            // reinitialize if there is two order in same txt
+
+                            List = new List<SamsungOrderRow>();
+
+                            orderRow = new SamsungOrderRow();
+
+                            samsungOrder = new SamsungOrder();
+
 
                         }
 
